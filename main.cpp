@@ -76,14 +76,31 @@ int main()
 	{
 		if (loadMedia())
 		{
-			//Fill the surface white
-			SDL_FillRect(SCREENSURFACE, NULL, SDL_MapRGB(SCREENSURFACE->format, 0xFF, 0xFF, 0xFF));
+			//main loop flag
+			bool quit = false;
 
-			//update the surface
-			SDL_UpdateWindowSurface(WINDOW);
+			//event handler
+			SDL_Event e;
 
-			//wait
-			SDL_Delay(2000);
+			//while application is running
+			while (!quit)
+			{
+				//Handle events in the queue
+				while (SDL_PollEvent(&e) != 0)
+				{
+					//user quits
+					if (e.type == SDL_QUIT)
+					{
+						quit = true;
+					}
+				}
+
+				//Fill the surface white
+				SDL_FillRect(SCREENSURFACE, NULL, SDL_MapRGB(SCREENSURFACE->format, 0xFF, 0xFF, 0xFF));
+
+				//update the surface
+				SDL_UpdateWindowSurface(WINDOW);
+			}
 		}
 	}
 
