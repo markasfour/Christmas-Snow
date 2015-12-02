@@ -1,5 +1,6 @@
 #include <iostream>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 using namespace std;
 
 //screen dimensions
@@ -14,6 +15,9 @@ bool loadMedia();
 
 //Frees media and shuts SDL down
 void close();
+
+//load individual image
+SDL_Surface* loadSurface(string path);
 
 //the window to render to 
 SDL_Window *WINDOW = NULL;
@@ -44,6 +48,13 @@ bool init()
 		}
 		else
 		{
+			//init PNG loading
+			int imgFlags = IMG_INIT_PNG;
+			if (!(IMG_Init(imgFlags) & imgFlags))
+			{
+				cout << "SDL_image could not initialize. SDL_image Error: " << IMG_GetError();
+				return false;
+			}
 			//get window surface
 			SCREENSURFACE = SDL_GetWindowSurface(WINDOW);
 		}
@@ -53,6 +64,14 @@ bool init()
 
 bool loadMedia()
 {
+	//Load image
+	IMAGE = loadSurface("./content/background.png");
+	if (IMAGE == NULL)
+	{
+		cout << "Failed to load image." << endl;
+		return false;
+	}
+	
 	return true;
 }
 
@@ -67,7 +86,34 @@ void close()
 	WINDOW = NULL;
 
 	//Quit SDL
+	IMG_Quit();
 	SDL_Quit();
+}
+
+SDL_Surface* loadSurface(string path)
+{
+	//final optimized image
+	SDL_Surface* optimizedSurface = NULL;
+
+	//Load image at specified path
+	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
+	if (loadedSurface == NULL)
+	{
+		cout << "Unable to load image. SDL_image Error: " << IMG_GetError();
+	}
+	else
+	{
+		//convert surface to screen format
+		optimizedSurface = SDL_ConvertSurface(loadedSurface, SCREENSURFACE->format, NULL);
+		if (optimizedSurface == NULL)
+		{
+			cout << "Unable to optimize image. SDL_Error: " << SDL_GetError();
+		}
+
+		//discard old loaded surface
+		SDL_FreeSurface(loadedSurface);
+	}
+	return optimizedSurface;
 }
 
 int main()
@@ -94,9 +140,16 @@ int main()
 						quit = true;
 					}
 				}
+				
+				//stretch & scale image
+				SDL_Rect stretchRect;
+				stretchRect.x = 0;
+				stretchRect.y = 0;
+				stretchRect.w = SCREEN_WIDTH;
+				stretchRect.h = SCREEN_HEIGHT;
 
-				//Fill the surface white
-				SDL_FillRect(SCREENSURFACE, NULL, SDL_MapRGB(SCREENSURFACE->format, 0xFF, 0xFF, 0xFF));
+				//apply the image to surface
+				SDL_BlitScaled(IMAGE, NULL, SCREENSURFACE, &stretchRect);
 
 				//update the surface
 				SDL_UpdateWindowSurface(WINDOW);
