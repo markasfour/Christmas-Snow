@@ -1,11 +1,23 @@
 #include <iostream>
+#include <vector>
+#include <stdio.h>
+#include <sstream>
+
+#ifdef WINDOWS
+    #include <direct.h>
+    #define GetCurrentDir _getcwd
+#else
+	#include <unistd.h>
+	#define GetCurrentDir getcwd
+#endif
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-using namespace std;
 
-//screen dimensions
-const int SCREEN_WIDTH = 1280;
-const int SCREEN_HEIGHT = 720;
+#include "globals.h"
+#include "texture.h"
+
+using namespace std;
 
 //stars SDL and creates window
 bool init();
@@ -16,17 +28,11 @@ bool loadMedia();
 //Frees media and shuts SDL down
 void close();
 
-//load individual image
-SDL_Surface* loadSurface(string path);
+//loads individual image
+SDL_Surface *loadSurface(string path);
 
-//the window to render to 
-SDL_Window *WINDOW = NULL;
-	
-//the surface contained by the window
-SDL_Surface *SCREENSURFACE = NULL;
-
-//image to load and show on screen
-SDL_Surface *IMAGE = NULL;
+//flake storage
+vector <LTexture> FLAKES;
 
 
 bool init()
@@ -39,8 +45,14 @@ bool init()
 	}
 	else
 	{
+		//set texture filtering to linear
+		if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1"))
+		{
+			cout << "Warning: Linear texture filtering not enabled.";
+		}
+		
 		//create window
-		WINDOW = SDL_CreateWindow( "Christmas Snow", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+		WINDOW = SDL_CreateWindow( "Christmas Snow", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 		if (WINDOW == NULL)
 		{
 			cout << "Window could not be created. SDL_Error: " << SDL_GetError() << endl;
@@ -48,25 +60,41 @@ bool init()
 		}
 		else
 		{
-			//init PNG loading
-			int imgFlags = IMG_INIT_PNG;
-			if (!(IMG_Init(imgFlags) & imgFlags))
+			//create renderer for window
+			RENDERER = SDL_CreateRenderer(WINDOW, -1, SDL_RENDERER_ACCELERATED);
+			if (RENDERER == NULL)
 			{
-				cout << "SDL_image could not initialize. SDL_image Error: " << IMG_GetError();
+				cout << "Renderer could not be created. SDL_Error: " << SDL_GetError();
 				return false;
 			}
-			//get window surface
-			SCREENSURFACE = SDL_GetWindowSurface(WINDOW);
+			else
+			{
+				//init renderer color
+				SDL_SetRenderDrawColor(RENDERER, 0xFF, 0xFF, 0xFF, 0xFF);
+
+				//init PNG loading
+				int imgFlags = IMG_INIT_PNG;
+				if (!(IMG_Init(imgFlags) & imgFlags))
+				{
+					cout << "SDL_image could not initialize. SDL_image Error: " << IMG_GetError();
+					return false;
+				}
+
+				//get window surface
+				SCREENSURFACE = SDL_GetWindowSurface(WINDOW);
+			}
 		}
 	}
 	return true;
 }
 
-bool loadMedia()
+bool loadMedia(string cCurrentPath)
 {
-	//Load image
-	IMAGE = loadSurface("./content/background.png");
-	if (IMAGE == NULL)
+	//load  stretching surface
+	stringstream path;
+	path << cCurrentPath << "/content/background.png";
+	BACKGROUND = loadSurface (path.str());
+	if (BACKGROUND == NULL)
 	{
 		cout << "Failed to load image." << endl;
 		return false;
@@ -77,11 +105,13 @@ bool loadMedia()
 
 void close()
 {
-	//Deallocate surface
-	SDL_FreeSurface(IMAGE);
-	IMAGE = NULL;
+	//free loaded images
+	SDL_FreeSurface(BACKGROUND);
+	BACKGROUND = NULL;
 
 	//Destroy window
+	SDL_DestroyRenderer(RENDERER);
+	RENDERER = NULL;
 	SDL_DestroyWindow(WINDOW);
 	WINDOW = NULL;
 
@@ -90,13 +120,13 @@ void close()
 	SDL_Quit();
 }
 
-SDL_Surface* loadSurface(string path)
+SDL_Surface *loadSurface(string path)
 {
 	//final optimized image
-	SDL_Surface* optimizedSurface = NULL;
+	SDL_Surface *optimizedSurface = NULL;
 
-	//Load image at specified path
-	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
+	//load image from path
+	SDL_Surface *loadedSurface = IMG_Load(path.c_str());
 	if (loadedSurface == NULL)
 	{
 		cout << "Unable to load image. SDL_image Error: " << IMG_GetError();
@@ -110,7 +140,7 @@ SDL_Surface* loadSurface(string path)
 			cout << "Unable to optimize image. SDL_Error: " << SDL_GetError();
 		}
 
-		//discard old loaded surface
+		//remove old loaded surface
 		SDL_FreeSurface(loadedSurface);
 	}
 	return optimizedSurface;
@@ -118,9 +148,19 @@ SDL_Surface* loadSurface(string path)
 
 int main()
 {
+	//get current path to program
+	char cCurrentPath[FILENAME_MAX];
+	if (!GetCurrentDir(cCurrentPath, sizeof(cCurrentPath)))
+	{
+     	 return -1;
+	}
+	cCurrentPath[sizeof(cCurrentPath) - 1] = '\0';
+	
+	//init SDL
 	if (init())
 	{
-		if (loadMedia())
+		//load all media
+		if (loadMedia(cCurrentPath))
 		{
 			//main loop flag
 			bool quit = false;
@@ -128,7 +168,13 @@ int main()
 			//event handler
 			SDL_Event e;
 
-			//while application is running
+			SDL_Rect flake;
+			flake.x = 300;
+			flake.y = 300;
+			flake.w = 20;
+			flake.h = 20;
+
+			//Main loop
 			while (!quit)
 			{
 				//Handle events in the queue
@@ -140,6 +186,9 @@ int main()
 						quit = true;
 					}
 				}
+			
+				SDL_SetRenderDrawColor(RENDERER, 0xFF, 0xFF, 0xFF, 0xFF);
+				SDL_RenderClear(RENDERER);
 				
 				//stretch & scale image
 				SDL_Rect stretchRect;
@@ -149,10 +198,15 @@ int main()
 				stretchRect.h = SCREEN_HEIGHT;
 
 				//apply the image to surface
-				SDL_BlitScaled(IMAGE, NULL, SCREENSURFACE, &stretchRect);
+				//SDL_BlitScaled(BACKGROUND, NULL, SCREENSURFACE, &stretchRect);
 
+				SDL_RenderDrawRect(RENDERER, &flake);
+				
 				//update the surface
-				SDL_UpdateWindowSurface(WINDOW);
+				//SDL_UpdateWindowSurface(WINDOW);
+
+				//update the screen
+				SDL_RenderPresent(RENDERER);
 			}
 		}
 	}
