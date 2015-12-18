@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <sstream>
 #include <time.h>
-
 #ifdef WINDOWS
     #include <direct.h>
     #define GetCurrentDir _getcwd
@@ -11,30 +10,28 @@
 	#include <unistd.h>
 	#define GetCurrentDir getcwd
 #endif
-
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-
-#include "globals.h"
 #include "texture.h"
-#include "Timer.h"
+#include "timer.h"
 #include "flake.h"
-
 using namespace std;
 
-//stars SDL and creates window
+//PROTOTYPES
+//starts SDL and creates window
 bool init();
-
 //loads media
 bool loadMedia();
-
 //Frees media and shuts SDL down
 void close();
 
-//loads individual image
-SDL_Surface *loadSurface(string path);
-
-
+//GLOBAL VARIABLES
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 480;
+const int FRAMES_PER_SECOND = 60;
+SDL_Window *WINDOW = NULL;
+SDL_Renderer *RENDERER = NULL;
+SDL_Surface *SCREENSURFACE = NULL;
 LTexture background;
 
 bool init()
@@ -96,13 +93,9 @@ bool loadMedia(string cCurrentPath)
 	stringstream path;
 	path << cCurrentPath << "/content/background.jpg";
 	
-	background.loadFromFile(path.str());
-	//BACKGROUND = loadSurface (path.str());
-	//if (BACKGROUND == NULL)
-	//{
-	//	cout << "Failed to load image." << endl;
-	//	return false;
-	//}
+	background.loadFromFile(path.str(), RENDERER);
+	if (background.mTexture == NULL)
+		return false;
 	
 	return true;
 }
@@ -110,8 +103,7 @@ bool loadMedia(string cCurrentPath)
 void close()
 {
 	//free loaded images
-	SDL_FreeSurface(BACKGROUND);
-	BACKGROUND = NULL;
+	background.free();
 
 	//Destroy window
 	SDL_DestroyRenderer(RENDERER);
@@ -122,32 +114,6 @@ void close()
 	//Quit SDL
 	IMG_Quit();
 	SDL_Quit();
-}
-
-SDL_Surface *loadSurface(string path)
-{
-	//final optimized image
-	SDL_Surface *optimizedSurface = NULL;
-
-	//load image from path
-	SDL_Surface *loadedSurface = IMG_Load(path.c_str());
-	if (loadedSurface == NULL)
-	{
-		cout << "Unable to load image. SDL_image Error: " << IMG_GetError();
-	}
-	else
-	{
-		//convert surface to screen format
-		optimizedSurface = SDL_ConvertSurface(loadedSurface, SCREENSURFACE->format, NULL);
-		if (optimizedSurface == NULL)
-		{
-			cout << "Unable to optimize image. SDL_Error: " << SDL_GetError();
-		}
-
-		//remove old loaded surface
-		SDL_FreeSurface(loadedSurface);
-	}
-	return optimizedSurface;
 }
 
 int main()
@@ -168,80 +134,72 @@ int main()
 	vector <flake> flakes;
 
 	//init SDL
-	if (init())
+	if (!init())
+		return -1;
+		
+	//load all media
+	if (!loadMedia(cCurrentPath))
+		return -1;
+		
+	//main loop flag
+	bool quit = false;
+
+	//event handler
+	SDL_Event e;
+	
+	//Main loop
+	while (!quit)
 	{
-		//load all media
-		if (loadMedia(cCurrentPath))
+		//start the frame timer
+		fps.start();
+		
+		//Handle events in the queue
+		while (SDL_PollEvent(&e) != 0)
 		{
-			//SDL_Texture *background = SDL_CreateTextureFromSurface(RENDERER, BACKGROUND);
-			//if (background == NULL) cout << "FUCK" << endl;
-			//main loop flag
-			bool quit = false;
-
-			//event handler
-			SDL_Event e;
-			
-			//Main loop
-			while (!quit)
+			//user quits
+			if (e.type == SDL_QUIT)
 			{
-				//start the frame timer
-				fps.start();
-				
-				//Handle events in the queue
-				while (SDL_PollEvent(&e) != 0)
-				{
-					//user quits
-					if (e.type == SDL_QUIT)
-					{
-						quit = true;
-					}
-				}
-				
-				//clear screen
-				SDL_SetRenderDrawColor(RENDERER, 0, 0, 0, 255);
-				SDL_RenderClear(RENDERER);
-				
-				//stretch & scale image
-				SDL_Rect stretchRect;
-				stretchRect.x = 0;
-				stretchRect.y = 0;
-				stretchRect.w = SCREEN_WIDTH;
-				stretchRect.h = SCREEN_HEIGHT;
-				//background.render(0,0);
-				SDL_RenderCopy(RENDERER, background.mTexture, NULL, &stretchRect);
-				//SDL_BlitScaled(BACKGROUND, NULL, SCREENSURFACE, &stretchRect);
-				
-				//update the surface
-				//SDL_UpdateWindowSurface(WINDOW);
-
-				//make flake
-				flake *f = new flake();
-				flakes.push_back(*f);
-				
-				//draw flake
-				for (int i = 0; i < flakes.size(); i++)
-				{
-					flakes.at(i).move();
-					if (flakes.at(i).R.y == SCREEN_HEIGHT)
-					{
-						flakes.erase(flakes.begin() + i);
-					}
-					else
-					{
-						SDL_SetRenderDrawColor(RENDERER, flakes.at(i).r, flakes.at(i).g, flakes.at(i).b, flakes.at(i).a);
-						SDL_RenderFillRect(RENDERER, &flakes.at(i).R);
-					}
-				}
-				
-				
-				//update the screen
-				SDL_RenderPresent(RENDERER);
-				
-				//cap the frame rate
-				if (fps.get_ticks() < 1000/FRAMES_PER_SECOND)
-					SDL_Delay((1000/FRAMES_PER_SECOND) - fps.get_ticks());
+				quit = true;
 			}
 		}
+		
+		//clear screen
+		SDL_SetRenderDrawColor(RENDERER, 0, 0, 0, 255);
+		SDL_RenderClear(RENDERER);
+		
+		//stretch & scale image
+		SDL_Rect stretchRect;
+		stretchRect.x = 0;
+		stretchRect.y = 0;
+		stretchRect.w = SCREEN_WIDTH;
+		stretchRect.h = SCREEN_HEIGHT;
+		SDL_RenderCopy(RENDERER, background.mTexture, NULL, &stretchRect);
+		
+		//make flake
+		flake *f = new flake(SCREEN_WIDTH);
+		flakes.push_back(*f);
+		
+		//draw flake
+		for (int i = 0; i < flakes.size(); i++)
+		{
+			flakes.at(i).move();
+			if (flakes.at(i).R.y == SCREEN_HEIGHT)
+			{
+				flakes.erase(flakes.begin() + i);
+			}
+			else
+			{
+				SDL_SetRenderDrawColor(RENDERER, flakes.at(i).r, flakes.at(i).g, flakes.at(i).b, flakes.at(i).a);
+				SDL_RenderFillRect(RENDERER, &flakes.at(i).R);
+			}
+		}
+		
+		//update the screen
+		SDL_RenderPresent(RENDERER);
+		
+		//cap the frame rate
+		if (fps.get_ticks() < 1000/FRAMES_PER_SECOND)
+			SDL_Delay((1000/FRAMES_PER_SECOND) - fps.get_ticks());
 	}
 
 	close();

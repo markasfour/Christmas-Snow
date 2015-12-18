@@ -4,39 +4,34 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include "globals.h"
 using namespace std;
 
 //Texture wrapper class
 class LTexture
 {
-	public: 
-		//init variables
-		LTexture();
+	public:
 
-		//Deallocates memory
-		~LTexture();
+	//the actual hardware texture
+	SDL_Texture *mTexture;
 
-		//loads image from path
-		bool loadFromFile(string path);
+	//image dimensions
+	int mWidth;
+	int mHeight;
+	
+	//init variables
+	LTexture();
 
-		//renders texture at given point
-		void render(int x, int y);
+	//Deallocates memory
+	~LTexture();
 
-		//deallocates texture
-		void free();
+	//loads image from path
+	bool loadFromFile(string path, SDL_Renderer *RENDERER);
 
-		//gets image dimensions
-		int getWidth();
-		int getHeight();
-		//the actual hardware texture
-		SDL_Texture *mTexture;
-	private:
-		
+	//renders texture at given point
+	void render(int x, int y);
 
-		//image dimensions
-		int mWidth;
-		int mHeight;
+	//deallocates texture
+	void free();
 };
 
 LTexture::LTexture()
@@ -53,7 +48,7 @@ LTexture::~LTexture()
 	free();
 }
 
-bool LTexture::loadFromFile(string path)
+bool LTexture::loadFromFile(string path, SDL_Renderer *RENDERER)
 {
 	//remove preexisting texture
 	free();
@@ -69,9 +64,6 @@ bool LTexture::loadFromFile(string path)
 	}
 	else
 	{
-		//color key image
-		//SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0, 0xFF, 0xFF));
-		
 		//create texture from surface pixels
 		newTexture = SDL_CreateTextureFromSurface(RENDERER, loadedSurface);
 		if (newTexture == NULL)
@@ -104,23 +96,6 @@ void LTexture::free()
 		mWidth = 0;
 		mHeight = 0;
 	}
-}
-
-void LTexture::render(int x, int y)
-{
-	//set rendering space and render to screen
-	SDL_Rect renderQuad = {x, y, mWidth, mHeight};
-	SDL_RenderCopy(RENDERER, mTexture, NULL, &renderQuad);
-}
-
-int LTexture::getWidth()
-{
-	return mWidth;
-}
-
-int LTexture::getHeight()
-{
-	return mHeight;
 }
 
 #endif
