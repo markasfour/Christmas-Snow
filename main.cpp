@@ -146,12 +146,18 @@ int main()
 
 	//event handler
 	SDL_Event e;
-	
+
+	//mouse location
+	int mouse_x = 0, mouse_y = 0;
+
 	//Main loop
 	while (!quit)
 	{
 		//start the frame timer
 		fps.start();
+		
+		//get mouse location
+		SDL_GetMouseState(&mouse_x, &mouse_y);
 		
 		//Handle events in the queue
 		while (SDL_PollEvent(&e) != 0)
@@ -167,7 +173,7 @@ int main()
 		SDL_SetRenderDrawColor(RENDERER, 0, 0, 0, 255);
 		SDL_RenderClear(RENDERER);
 		
-		//stretch & scale image
+		//stretch & scale background image
 		SDL_Rect stretchRect;
 		stretchRect.x = 0;
 		stretchRect.y = 0;
@@ -182,7 +188,7 @@ int main()
 		//draw flake
 		for (int i = 0; i < flakes.size(); i++)
 		{
-			flakes.at(i).move();
+			flakes.at(i).move(mouse_x, mouse_y);
 			if (flakes.at(i).R.y == SCREEN_HEIGHT)
 			{
 				flakes.erase(flakes.begin() + i);

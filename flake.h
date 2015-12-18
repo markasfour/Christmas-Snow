@@ -32,9 +32,9 @@ struct flake
 		else if (temp == 2)
 			Back = true;
 		if (Front)
-			r = 0xFF, g = 0x00, b = 0x00, a = 0xFF;
+			r = 0xFF, g = 0xFF, b = 0xFF, a = 0xFF;
 		else if (Middle)
-			r = 0x00, g = 0xFF, b = 0x00, a = 0xFF;
+			r = 0xFF, g = 0xFF, b = 0xFF, a = 0xFF;
 		else if (Back)
 			r = 0xFF, g = 0xFF, b = 0xFF, a = 0xFF;
 	}
@@ -53,16 +53,29 @@ struct flake
 		else if (temp == 2)
 			Back = true;
 		if (Front)
-			r = 0xFF, g = 0x00, b = 0x00, a = 0xFF;
+			r = 0xFF, g = 0xFF, b = 0xFF, a = 0xFF;
 		else if (Middle)
-			r = 0x00, g = 0xFF, b = 0x00, a = 0xFF;
+			r = 0xFF, g = 0xFF, b = 0xFF, a = 0xFF;
 		else if (Back)
 			r = 0xFF, g = 0xFF, b = 0xFF, a = 0xFF;
 	}
 	
-	void move()
+	void move(int mouse_x, int mouse_y)
 	{
 		R.y++;
+		int dx = mouse_x - R.x;
+		int dy = mouse_y - R.y;
+		if (abs(dx) < 100 && abs(dy) < 100)
+		{
+			if (dx > 0)
+				R.x--;
+			else if (dx < 0)
+				R.x++;
+			if (dy > 0)
+				R.y--;
+			else if (dy < 0)
+				R.y++;
+		}
 	}
 
 
