@@ -219,6 +219,7 @@ int main()
 				//draw flake
 				for (int i = 0; i < flakes.size(); i++)
 				{
+					flakes.at(i).move();
 					SDL_SetRenderDrawColor(RENDERER, flakes.at(i).r, flakes.at(i).g, flakes.at(i).b, flakes.at(i).a);
 					SDL_RenderFillRect(RENDERER, &flakes.at(i).R);
 				}

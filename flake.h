@@ -38,6 +38,11 @@ struct flake
 		else if (Back)
 			r = 0xDF, g = 0xDF, b = 0xDF0, a = 0xFF;
 	}
+
+	void move()
+	{
+		R.y++;
+	}
 };
 
 #endif
