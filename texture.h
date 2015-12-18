@@ -29,10 +29,10 @@ class LTexture
 		//gets image dimensions
 		int getWidth();
 		int getHeight();
-
-	private:
 		//the actual hardware texture
 		SDL_Texture *mTexture;
+	private:
+		
 
 		//image dimensions
 		int mWidth;

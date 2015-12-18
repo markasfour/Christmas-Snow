@@ -34,9 +34,8 @@ void close();
 //loads individual image
 SDL_Surface *loadSurface(string path);
 
-//flake storage
-vector <LTexture> FLAKES;
 
+LTexture background;
 
 bool init()
 {
@@ -95,13 +94,15 @@ bool loadMedia(string cCurrentPath)
 {
 	//load  stretching surface
 	stringstream path;
-	path << cCurrentPath << "/content/background.png";
-	BACKGROUND = loadSurface (path.str());
-	if (BACKGROUND == NULL)
-	{
-		cout << "Failed to load image." << endl;
-		return false;
-	}
+	path << cCurrentPath << "/content/background.jpg";
+	
+	background.loadFromFile(path.str());
+	//BACKGROUND = loadSurface (path.str());
+	//if (BACKGROUND == NULL)
+	//{
+	//	cout << "Failed to load image." << endl;
+	//	return false;
+	//}
 	
 	return true;
 }
@@ -159,7 +160,7 @@ int main()
 	if (!GetCurrentDir(cCurrentPath, sizeof(cCurrentPath)))
      	 return -1;
 	cCurrentPath[sizeof(cCurrentPath) - 1] = '\0';
-	
+
 	//frame rate regulator
 	Timer fps;
 	
@@ -172,12 +173,14 @@ int main()
 		//load all media
 		if (loadMedia(cCurrentPath))
 		{
+			//SDL_Texture *background = SDL_CreateTextureFromSurface(RENDERER, BACKGROUND);
+			//if (background == NULL) cout << "FUCK" << endl;
 			//main loop flag
 			bool quit = false;
 
 			//event handler
 			SDL_Event e;
-
+			
 			//Main loop
 			while (!quit)
 			{
@@ -199,18 +202,17 @@ int main()
 				SDL_RenderClear(RENDERER);
 				
 				//stretch & scale image
-				//SDL_Rect stretchRect;
-				//stretchRect.x = 0;
-				//stretchRect.y = 0;
-				//stretchRect.w = SCREEN_WIDTH;
-				//stretchRect.h = SCREEN_HEIGHT;
+				SDL_Rect stretchRect;
+				stretchRect.x = 0;
+				stretchRect.y = 0;
+				stretchRect.w = SCREEN_WIDTH;
+				stretchRect.h = SCREEN_HEIGHT;
+				//background.render(0,0);
+				SDL_RenderCopy(RENDERER, background.mTexture, NULL, &stretchRect);
 				//SDL_BlitScaled(BACKGROUND, NULL, SCREENSURFACE, &stretchRect);
-
-				//SDL_RenderDrawRect(RENDERER, &flake);
 				
 				//update the surface
 				//SDL_UpdateWindowSurface(WINDOW);
-
 
 				//make flake
 				flake *f = new flake();
@@ -220,10 +222,18 @@ int main()
 				for (int i = 0; i < flakes.size(); i++)
 				{
 					flakes.at(i).move();
-					SDL_SetRenderDrawColor(RENDERER, flakes.at(i).r, flakes.at(i).g, flakes.at(i).b, flakes.at(i).a);
-					SDL_RenderFillRect(RENDERER, &flakes.at(i).R);
+					if (flakes.at(i).R.y == SCREEN_HEIGHT)
+					{
+						flakes.erase(flakes.begin() + i);
+					}
+					else
+					{
+						SDL_SetRenderDrawColor(RENDERER, flakes.at(i).r, flakes.at(i).g, flakes.at(i).b, flakes.at(i).a);
+						SDL_RenderFillRect(RENDERER, &flakes.at(i).R);
+					}
 				}
-
+				
+				
 				//update the screen
 				SDL_RenderPresent(RENDERER);
 				
