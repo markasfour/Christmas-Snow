@@ -186,7 +186,8 @@ int main()
 						quit = true;
 					}
 				}
-			
+				
+				//clear screen
 				SDL_SetRenderDrawColor(RENDERER, 0xFF, 0xFF, 0xFF, 0xFF);
 				SDL_RenderClear(RENDERER);
 				
@@ -196,17 +197,15 @@ int main()
 				stretchRect.y = 0;
 				stretchRect.w = SCREEN_WIDTH;
 				stretchRect.h = SCREEN_HEIGHT;
+				SDL_BlitScaled(BACKGROUND, NULL, SCREENSURFACE, &stretchRect);
 
-				//apply the image to surface
-				//SDL_BlitScaled(BACKGROUND, NULL, SCREENSURFACE, &stretchRect);
-
-				SDL_RenderDrawRect(RENDERER, &flake);
+				//SDL_RenderDrawRect(RENDERER, &flake);
 				
 				//update the surface
-				//SDL_UpdateWindowSurface(WINDOW);
+				SDL_UpdateWindowSurface(WINDOW);
 
 				//update the screen
-				SDL_RenderPresent(RENDERER);
+				//SDL_RenderPresent(RENDERER);
 			}
 		}
 	}
