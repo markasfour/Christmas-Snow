@@ -16,6 +16,7 @@
 
 #include "globals.h"
 #include "texture.h"
+#include "Timer.h"
 
 using namespace std;
 
@@ -156,6 +157,9 @@ int main()
 	}
 	cCurrentPath[sizeof(cCurrentPath) - 1] = '\0';
 	
+	//frame rate regulator
+	Timer fps;
+
 	//init SDL
 	if (init())
 	{
@@ -177,6 +181,9 @@ int main()
 			//Main loop
 			while (!quit)
 			{
+				//start the frame timer
+				fps.start();
+				
 				//Handle events in the queue
 				while (SDL_PollEvent(&e) != 0)
 				{
@@ -206,6 +213,10 @@ int main()
 
 				//update the screen
 				//SDL_RenderPresent(RENDERER);
+				
+				//cap the frame rate
+				if (fps.get_ticks() < 1000/FRAMES_PER_SECOND)
+					SDL_Delay((1000/FRAMES_PER_SECOND) - fps.get_ticks());
 			}
 		}
 	}

@@ -22,4 +22,7 @@ SDL_Surface *SCREENSURFACE = NULL;
 //Current displayed image
 SDL_Surface *BACKGROUND = NULL;
 
+//frame rate
+const int FRAMES_PER_SECOND = 60;
+
 #endif
