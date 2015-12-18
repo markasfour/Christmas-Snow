@@ -2,6 +2,7 @@
 #include <vector>
 #include <stdio.h>
 #include <sstream>
+#include <time.h>
 
 #ifdef WINDOWS
     #include <direct.h>
@@ -17,6 +18,7 @@
 #include "globals.h"
 #include "texture.h"
 #include "Timer.h"
+#include "flake.h"
 
 using namespace std;
 
@@ -149,16 +151,20 @@ SDL_Surface *loadSurface(string path)
 
 int main()
 {
+	//set rand seed
+	srand(time(NULL));
+	
 	//get current path to program
 	char cCurrentPath[FILENAME_MAX];
 	if (!GetCurrentDir(cCurrentPath, sizeof(cCurrentPath)))
-	{
      	 return -1;
-	}
 	cCurrentPath[sizeof(cCurrentPath) - 1] = '\0';
 	
 	//frame rate regulator
 	Timer fps;
+	
+	//set up flakes
+	vector <flake> flakes;
 
 	//init SDL
 	if (init())
@@ -171,12 +177,6 @@ int main()
 
 			//event handler
 			SDL_Event e;
-
-			SDL_Rect flake;
-			flake.x = 300;
-			flake.y = 300;
-			flake.w = 20;
-			flake.h = 20;
 
 			//Main loop
 			while (!quit)
@@ -195,24 +195,36 @@ int main()
 				}
 				
 				//clear screen
-				SDL_SetRenderDrawColor(RENDERER, 0xFF, 0xFF, 0xFF, 0xFF);
+				SDL_SetRenderDrawColor(RENDERER, 0, 0, 0, 255);
 				SDL_RenderClear(RENDERER);
 				
 				//stretch & scale image
-				SDL_Rect stretchRect;
-				stretchRect.x = 0;
-				stretchRect.y = 0;
-				stretchRect.w = SCREEN_WIDTH;
-				stretchRect.h = SCREEN_HEIGHT;
-				SDL_BlitScaled(BACKGROUND, NULL, SCREENSURFACE, &stretchRect);
+				//SDL_Rect stretchRect;
+				//stretchRect.x = 0;
+				//stretchRect.y = 0;
+				//stretchRect.w = SCREEN_WIDTH;
+				//stretchRect.h = SCREEN_HEIGHT;
+				//SDL_BlitScaled(BACKGROUND, NULL, SCREENSURFACE, &stretchRect);
 
 				//SDL_RenderDrawRect(RENDERER, &flake);
 				
 				//update the surface
-				SDL_UpdateWindowSurface(WINDOW);
+				//SDL_UpdateWindowSurface(WINDOW);
+
+
+				//make flake
+				flake *f = new flake();
+				flakes.push_back(*f);
+				
+				//draw flake
+				for (int i = 0; i < flakes.size(); i++)
+				{
+					SDL_SetRenderDrawColor(RENDERER, flakes.at(i).r, flakes.at(i).g, flakes.at(i).b, flakes.at(i).a);
+					SDL_RenderFillRect(RENDERER, &flakes.at(i).R);
+				}
 
 				//update the screen
-				//SDL_RenderPresent(RENDERER);
+				SDL_RenderPresent(RENDERER);
 				
 				//cap the frame rate
 				if (fps.get_ticks() < 1000/FRAMES_PER_SECOND)
