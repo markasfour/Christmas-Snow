@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <stdlib.h>
+#include <cmath>
 using namespace std;
 
 struct flake
@@ -13,8 +14,8 @@ struct flake
 	Uint8 g = 0xFF;
 	Uint8 b = 0xFF;
 	Uint8 a = 0xFF;
-	int v_x = 0;
-	int v_y = 0;
+	float v_x = 0;
+	float v_y = 0;
 	bool Front = false;
 	bool Middle = false;
 	bool Back = false;
@@ -23,8 +24,8 @@ struct flake
 	{
 		R.x = 0;
 		R.y = 0;
-		R.w = 5;
-		R.h = 5;
+		R.w = 3;
+		R.h = 3;
 		Front = true;
 	}
 
@@ -32,8 +33,8 @@ struct flake
 	{
 		R.x = rand() % SCREEN_WIDTH;
 		R.y = 0;
-		R.w = 5;
-		R.h = 5;
+		R.w = 3;
+		R.h = 3;
 		int temp = rand() % 3;
 		if (temp == 0)
 			Front = true;
@@ -83,22 +84,22 @@ struct flake
 		{
 			if (dx > 0) //flake left of mouse
 			{
-				R.x--;
+				R.x -= 5;
 				v_x -= (100/dx)/2;
 			}
 			else if (dx < 0) //flake right of mouse
 			{	
-				R.x++;
+				R.x += 5;
 				v_x += -1 * (100/dx)/2;
 			}
 			if (dy > 0) //flake above mouse
 			{	
-				R.y--;
+				R.y -= 5;
 				v_y -= (100/dy)/2;
 			}
 			else if (dy < 0) //flake below mouse
 			{	
-				R.y++;
+				R.y -= 5;
 				v_y += -1 * (100/dy)/2;
 			}
 		}

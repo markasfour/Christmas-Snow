@@ -33,6 +33,7 @@ SDL_Window *WINDOW = NULL;
 SDL_Renderer *RENDERER = NULL;
 SDL_Surface *SCREENSURFACE = NULL;
 LTexture background;
+LTexture frost;
 
 bool init()
 {
@@ -89,14 +90,21 @@ bool init()
 
 bool loadMedia(string cCurrentPath)
 {
-	//load  stretching surface
 	stringstream path;
+
 	path << cCurrentPath << "/content/background.jpg";
-	
 	background.loadFromFile(path.str(), RENDERER);
 	if (background.mTexture == NULL)
 		return false;
-	
+
+	//clear stringstream
+	path.str("");
+
+	path << cCurrentPath << "/content/Frost.png";
+	frost.loadFromFile(path.str(), RENDERER);
+	if (frost.mTexture == NULL)
+		return false;
+
 	return true;
 }
 
@@ -215,6 +223,9 @@ int main()
 			}
 		}
 		
+		//add frost texture
+		SDL_RenderCopy(RENDERER, frost.mTexture, NULL, &stretchRect);
+
 		//update the screen
 		SDL_RenderPresent(RENDERER);
 		
