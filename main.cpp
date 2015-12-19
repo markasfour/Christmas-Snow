@@ -150,6 +150,9 @@ int main()
 	//mouse location
 	int mouse_x = 0, mouse_y = 0;
 
+	//mouse click boolean
+	bool click = false;
+
 	//Main loop
 	while (!quit)
 	{
@@ -166,6 +169,14 @@ int main()
 			if (e.type == SDL_QUIT)
 			{
 				quit = true;
+			}
+			if (e.type == SDL_MOUSEBUTTONDOWN)
+			{
+				click = true;
+			}
+			if (e.type == SDL_MOUSEBUTTONUP)
+			{
+				click = false;
 			}
 		}
 		
@@ -188,7 +199,11 @@ int main()
 		//draw flake
 		for (int i = 0; i < flakes.size(); i++)
 		{
-			flakes.at(i).move(mouse_x, mouse_y);
+			flakes.at(i).move();
+			if (click)
+			{
+				flakes.at(i).on_click(mouse_x, mouse_y);
+			}
 			if (flakes.at(i).R.y == SCREEN_HEIGHT)
 			{
 				flakes.erase(flakes.begin() + i);
