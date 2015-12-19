@@ -140,6 +140,8 @@ int main()
 	
 	//set up flakes
 	vector <flake> flakes;
+	vector <flake> flakes2;
+	vector <flake> flakes3;
 
 	//init SDL
 	if (!init())
@@ -201,11 +203,49 @@ int main()
 		SDL_RenderCopy(RENDERER, background.mTexture, NULL, &stretchRect);
 		
 		//make flake
-		flake *f = new flake(SCREEN_WIDTH);
+		flake *f = new flake(SCREEN_WIDTH, 0);
 		flakes.push_back(*f);
+		flake *f2 = new flake(SCREEN_WIDTH, 1);
+		flakes.push_back(*f2);
+		flake *f3 = new flake(SCREEN_WIDTH, 2);
+		flakes.push_back(*f3);
 		
 		//draw flake
-		for (int i = 0; i < flakes.size(); i++)
+		for (int i = 0; i < flakes3.size(); i++) //back flakes
+		{
+			flakes3.at(i).move();
+			if (click)
+			{
+				flakes3.at(i).on_click(mouse_x, mouse_y);
+			}
+			if (flakes3.at(i).R.y == SCREEN_HEIGHT)
+			{
+				flakes3.erase(flakes3.begin() + i);
+			}
+			else
+			{
+				SDL_SetRenderDrawColor(RENDERER, flakes3.at(i).r, flakes3.at(i).g, flakes3.at(i).b, flakes3.at(i).a);
+				SDL_RenderFillRect(RENDERER, &flakes3.at(i).R);
+			}
+		}
+		for (int i = 0; i < flakes2.size(); i++) //middle flakes
+		{
+			flakes2.at(i).move();
+			if (click)
+			{
+				flakes2.at(i).on_click(mouse_x, mouse_y);
+			}
+			if (flakes2.at(i).R.y == SCREEN_HEIGHT)
+			{
+				flakes2.erase(flakes2.begin() + i);
+			}
+			else
+			{
+				SDL_SetRenderDrawColor(RENDERER, flakes2.at(i).r, flakes2.at(i).g, flakes2.at(i).b, flakes2.at(i).a);
+				SDL_RenderFillRect(RENDERER, &flakes2.at(i).R);
+			}
+		}
+		for (int i = 0; i < flakes.size(); i++) //front flakes
 		{
 			flakes.at(i).move();
 			if (click)
@@ -222,6 +262,7 @@ int main()
 				SDL_RenderFillRect(RENDERER, &flakes.at(i).R);
 			}
 		}
+		
 		
 		//add frost texture
 		SDL_RenderCopy(RENDERER, frost.mTexture, NULL, &stretchRect);
