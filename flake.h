@@ -90,26 +90,26 @@ struct flake
 		
 		int dx = mouse_x - R.x;
 		int dy = mouse_y - R.y;
-		if ((abs(dx) * abs(dx)) + (abs(dy) * abs(dy)) <= (100 * 100 * level))
+		if ((abs(dx) * abs(dx)) + (abs(dy) * abs(dy)) <= (150 * 150 * level))
 		{
 			if (dx > 0) //flake left of mouse
 			{
-				R.x -= 5 * level;
+				R.x -= 15 * level;
 				v_x -= (100/dx)/2 * level;
 			}
 			else if (dx < 0) //flake right of mouse
 			{	
-				R.x += 5 * level;
+				R.x += 15 * level;
 				v_x += -1 * (100/dx)/2 * level;
 			}
 			if (dy > 0) //flake above mouse
 			{	
-				R.y -= 5 * level;
+				R.y -= 15 * level;
 				v_y -= (100/dy)/2 * level;
 			}
 			else if (dy < 0) //flake below mouse
 			{	
-				R.y -= 5 * level;
+				R.y -= 15 * level;
 				v_y += -1 * (100/dy)/2 * level;
 			}
 		}

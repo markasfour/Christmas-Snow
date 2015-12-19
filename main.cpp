@@ -15,6 +15,7 @@
 #include "texture.h"
 #include "timer.h"
 #include "flake.h"
+#include "input.h"
 using namespace std;
 
 //PROTOTYPES
@@ -33,6 +34,9 @@ SDL_Window *WINDOW = NULL;
 SDL_Renderer *RENDERER = NULL;
 SDL_Surface *SCREENSURFACE = NULL;
 LTexture background;
+LTexture background2;
+LTexture background3;
+LTexture background4;
 LTexture frost;
 
 bool init()
@@ -95,6 +99,30 @@ bool loadMedia(string cCurrentPath)
 	path << cCurrentPath << "/content/background.jpg";
 	background.loadFromFile(path.str(), RENDERER);
 	if (background.mTexture == NULL)
+		return false;
+
+	//clear stringstream
+	path.str("");
+
+	path << cCurrentPath << "/content/background2.jpg";
+	background2.loadFromFile(path.str(), RENDERER);
+	if (background2.mTexture == NULL)
+		return false;
+
+	//clear stringstream
+	path.str("");
+
+	path << cCurrentPath << "/content/background3.jpg";
+	background3.loadFromFile(path.str(), RENDERER);
+	if (background3.mTexture == NULL)
+		return false;
+
+	//clear stringstream
+	path.str("");
+
+	path << cCurrentPath << "/content/background4.jpg";
+	background4.loadFromFile(path.str(), RENDERER);
+	if (background4.mTexture == NULL)
 		return false;
 
 	//clear stringstream
@@ -163,9 +191,21 @@ int main()
 	//mouse click boolean
 	bool click = false;
 
+	//backgrounds
+	bool b1 = true;
+	bool b2 = false;
+	bool b3 = false;
+	bool b4 = false;
+
+	//keyboard input handler
+	Input input;
+
 	//Main loop
 	while (!quit)
 	{
+		//start input handler
+		input.beginNewFrame();
+		
 		//start the frame timer
 		fps.start();
 		
@@ -188,6 +228,30 @@ int main()
 			{
 				click = false;
 			}
+			if (e.type == SDL_KEYDOWN)
+			{
+				if (e.key.repeat == 0) 
+				{
+					input.keyDownEvent(e);
+				}
+			}
+		}
+
+		if (input.wasKeyPressed(SDL_SCANCODE_1))
+		{
+			b1 = true, b2 = false, b3 = false, b4 = false;
+		}
+		if (input.wasKeyPressed(SDL_SCANCODE_2))
+		{
+			b1 = false, b2 = true, b3 = false, b4 = false;
+		}
+		if (input.wasKeyPressed(SDL_SCANCODE_3))
+		{
+			b1 = false, b2 = false, b3 = true, b4 = false;
+		}
+		if (input.wasKeyPressed(SDL_SCANCODE_4))
+		{
+			b1 = false , b2 = false, b3 = false, b4 = true;
 		}
 		
 		//clear screen
@@ -200,8 +264,15 @@ int main()
 		stretchRect.y = 0;
 		stretchRect.w = SCREEN_WIDTH;
 		stretchRect.h = SCREEN_HEIGHT;
-		SDL_RenderCopy(RENDERER, background.mTexture, NULL, &stretchRect);
-		
+		if (b1)
+			SDL_RenderCopy(RENDERER, background.mTexture, NULL, &stretchRect);
+		if (b2)
+			SDL_RenderCopy(RENDERER, background2.mTexture, NULL, &stretchRect);
+		if (b3)
+			SDL_RenderCopy(RENDERER, background3.mTexture, NULL, &stretchRect);
+		if (b4)
+			SDL_RenderCopy(RENDERER, background4.mTexture, NULL, &stretchRect);
+
 		//make flake
 		flake *f = new flake(SCREEN_WIDTH, 0);
 		flakes.push_back(*f);
@@ -262,7 +333,6 @@ int main()
 				SDL_RenderFillRect(RENDERER, &flakes.at(i).R);
 			}
 		}
-		
 		
 		//add frost texture
 		SDL_RenderCopy(RENDERER, frost.mTexture, NULL, &stretchRect);
