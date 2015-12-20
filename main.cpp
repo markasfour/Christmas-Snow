@@ -40,6 +40,7 @@ LTexture background3;
 LTexture background4;
 LTexture frost;
 Mix_Music *MUSIC = NULL;
+Mix_Chunk *BASS = NULL;
 
 bool init()
 {
@@ -151,6 +152,15 @@ bool loadMedia(string cCurrentPath)
 	if (MUSIC == NULL)
 		return false;
 
+	//clear stringstream
+	path.str("");
+
+	//load sound effects 
+	path << cCurrentPath << "/content/Bass_SE.wav";
+	BASS = Mix_LoadWAV(path.str().c_str());
+	if (MUSIC == NULL)
+		return false;
+
 	return true;
 }
 
@@ -162,6 +172,14 @@ void close()
 	background3.free();
 	background4.free();
 	frost.free();
+	
+	//free loaded music
+	Mix_FreeMusic(MUSIC);
+	MUSIC = NULL;
+
+	//free loaded sound effects
+	Mix_FreeChunk(BASS);
+	BASS = NULL;
 
 	//Destroy window
 	SDL_DestroyRenderer(RENDERER);
@@ -245,6 +263,7 @@ int main()
 			if (e.type == SDL_MOUSEBUTTONDOWN)
 			{
 				click = true;
+				Mix_PlayChannel(-1, BASS, 0);
 			}
 			if (e.type == SDL_MOUSEBUTTONUP)
 			{
