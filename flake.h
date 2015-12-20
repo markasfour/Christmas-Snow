@@ -21,7 +21,7 @@ struct flake
 	bool Back = false;
 
 	flake()	{}
-
+	
 	flake(int SCREEN_WIDTH, int location)
 	{
 		R.x = rand() % SCREEN_WIDTH;
@@ -95,22 +95,26 @@ struct flake
 			if (dx > 0) //flake left of mouse
 			{
 				R.x -= 15 * level;
-				v_x -= (100/dx)/2 * level;
+				v_x -= (dx * dx) / 150 * level;
+				//v_x -= (100/dx)/2 * level;
 			}
 			else if (dx < 0) //flake right of mouse
 			{	
 				R.x += 15 * level;
-				v_x += -1 * (100/dx)/2 * level;
+				v_x += (dx * dx) / 150 * level;
+				//v_x += -1 * (100/dx)/2 * level;
 			}
 			if (dy > 0) //flake above mouse
 			{	
 				R.y -= 15 * level;
-				v_y -= (100/dy)/2 * level;
+				v_y -= (dy * dy) / 150 * level;
+				//v_y -= (100/dy)/2 * level;
 			}
 			else if (dy < 0) //flake below mouse
 			{	
 				R.y -= 15 * level;
-				v_y += -1 * (100/dy)/2 * level;
+				v_y += (dy * dy) / 150 * level;
+				//v_y += -1 * (100/dy)/2 * level;
 			}
 		}
 	}

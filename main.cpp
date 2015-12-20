@@ -12,6 +12,7 @@
 #endif
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 #include "texture.h"
 #include "timer.h"
 #include "flake.h"
@@ -38,11 +39,12 @@ LTexture background2;
 LTexture background3;
 LTexture background4;
 LTexture frost;
+Mix_Music *MUSIC = NULL;
 
 bool init()
 {
 	//init SDL
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
 	{
 		cout << "SDL failed to initialize. SDL_Error: " << SDL_GetError() << endl;
 		return false;
@@ -84,6 +86,13 @@ bool init()
 					return false;
 				}
 
+				//Initialize SDL_mixer
+                if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
+                {
+					cout << "SDL_mixer could not initialize. SDL_mixer Error: " << Mix_GetError();
+					return false;
+                }
+
 				//get window surface
 				SCREENSURFACE = SDL_GetWindowSurface(WINDOW);
 			}
@@ -95,7 +104,7 @@ bool init()
 bool loadMedia(string cCurrentPath)
 {
 	stringstream path;
-
+	//load background images
 	path << cCurrentPath << "/content/background.jpg";
 	background.loadFromFile(path.str(), RENDERER);
 	if (background.mTexture == NULL)
@@ -133,6 +142,15 @@ bool loadMedia(string cCurrentPath)
 	if (frost.mTexture == NULL)
 		return false;
 
+	//clear stringstream
+	path.str("");
+
+	//load background music
+	path << cCurrentPath << "/content/LetItSnow.wav";
+	MUSIC = Mix_LoadMUS(path.str().c_str());
+	if (MUSIC == NULL)
+		return false;
+
 	return true;
 }
 
@@ -140,6 +158,10 @@ void close()
 {
 	//free loaded images
 	background.free();
+	background2.free();
+	background3.free();
+	background4.free();
+	frost.free();
 
 	//Destroy window
 	SDL_DestroyRenderer(RENDERER);
@@ -236,7 +258,8 @@ int main()
 				}
 			}
 		}
-
+		
+		//handle key presses
 		if (input.wasKeyPressed(SDL_SCANCODE_1))
 		{
 			b1 = true, b2 = false, b3 = false, b4 = false;
@@ -253,6 +276,10 @@ int main()
 		{
 			b1 = false , b2 = false, b3 = false, b4 = true;
 		}
+
+		//play music
+		if (Mix_PlayingMusic() == 0)
+			Mix_PlayMusic(MUSIC, -1);
 		
 		//clear screen
 		SDL_SetRenderDrawColor(RENDERER, 0, 0, 0, 255);
@@ -274,12 +301,12 @@ int main()
 			SDL_RenderCopy(RENDERER, background4.mTexture, NULL, &stretchRect);
 
 		//make flake
-		flake *f = new flake(SCREEN_WIDTH, 0);
-		flakes.push_back(*f);
-		flake *f2 = new flake(SCREEN_WIDTH, 1);
-		flakes.push_back(*f2);
-		flake *f3 = new flake(SCREEN_WIDTH, 2);
-		flakes.push_back(*f3);
+		flake f1(SCREEN_WIDTH, 0);
+		flakes.push_back(f1);
+		flake f2(SCREEN_WIDTH, 1);
+		flakes.push_back(f2);
+		flake f3(SCREEN_WIDTH, 2);
+		flakes.push_back(f3);
 		
 		//draw flake
 		for (int i = 0; i < flakes3.size(); i++) //back flakes
