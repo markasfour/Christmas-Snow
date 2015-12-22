@@ -95,28 +95,60 @@ struct flake
 			if (dx > 0) //flake left of mouse
 			{
 				R.x -= 15 * level;
-				v_x -= (dx * dx) / 150 * level;
+				v_x -= sqrt((dx * dx) / 150) * level;
 				//v_x -= (100/dx)/2 * level;
 			}
 			else if (dx < 0) //flake right of mouse
 			{	
 				R.x += 15 * level;
-				v_x += (dx * dx) / 150 * level;
+				v_x += sqrt((dx * dx) / 150) * level;
 				//v_x += -1 * (100/dx)/2 * level;
 			}
 			if (dy > 0) //flake above mouse
 			{	
 				R.y -= 15 * level;
-				v_y -= (dy * dy) / 150 * level;
+				v_y -= sqrt((dy * dy) / 150) * level;
 				//v_y -= (100/dy)/2 * level;
 			}
 			else if (dy < 0) //flake below mouse
 			{	
-				R.y -= 15 * level;
-				v_y += (dy * dy) / 150 * level;
+				R.y += 15 * level;
+				v_y += sqrt((dy * dy) / 150) * level;
 				//v_y += -1 * (100/dy)/2 * level;
 			}
 		}
+	}
+
+	void gravity(int mouse_x, int mouse_y, int power)
+	{
+		double level = 1;
+		if (Middle)
+			level /= 2;
+		if (Back)
+			level /= 3;
+		
+		int dx = mouse_x - R.x;
+		int dy = mouse_y - R.y;
+		if ((abs(dx) * abs(dx)) + (abs(dy) * abs(dy)) <= (power * power * level))
+		{
+			if (dx > 0) //flake left of mouse
+			{
+				R.x += sqrt((dx * dx) / power);
+			}
+			else if (dx < 0) //flake right of mouse
+			{	
+				R.x -= sqrt((dx * dx) / power);
+			}
+			if (dy > 0) //flake above mouse
+			{	
+				R.y += sqrt((dy * dy) / power);
+			}
+			else if (dy < 0) //flake below mouse
+			{	
+				R.y -= sqrt((dy * dy) / power);
+			}
+		}
+
 	}
 
 };
