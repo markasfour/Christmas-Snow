@@ -237,11 +237,6 @@ int main()
 	bool b3 = false;
 	bool b4 = false;
 
-	//mouse modes
-	bool mode1 = true;
-	bool mode2 = false;
-	int power = 0;
-
 	//keyboard input handler
 	Input input;
 
@@ -300,10 +295,6 @@ int main()
 		{
 			b1 = false , b2 = false, b3 = false, b4 = true;
 		}
-		if (input.wasKeyPressed(SDL_SCANCODE_M))
-		{
-			mode1 = !mode1, mode2 = !mode2;
-		}
 
 		//play music
 		if (Mix_PlayingMusic() == 0)
@@ -336,21 +327,13 @@ int main()
 		flake f3(SCREEN_WIDTH, 2);
 		flakes.push_back(f3);
 		
-		if (mode2 && power < SCREEN_HEIGHT)
-			power++;
-		else if (!mode2)
-			power = 0;
-
 		//draw flake
 		for (int i = 0; i < flakes3.size(); i++) //back flakes
 		{
-			if (mode2)
-				flakes3.at(i).gravity(mouse_x, mouse_y, power);
 			flakes3.at(i).move();
 			if (click)
 			{
 				flakes3.at(i).on_click(mouse_x, mouse_y);
-				power = 0;
 			}
 			if (flakes3.at(i).R.y == SCREEN_HEIGHT)
 			{
@@ -364,13 +347,10 @@ int main()
 		}
 		for (int i = 0; i < flakes2.size(); i++) //middle flakes
 		{
-			if (mode2)
-				flakes2.at(i).gravity(mouse_x, mouse_y, power);
 			flakes2.at(i).move();
 			if (click)
 			{
 				flakes2.at(i).on_click(mouse_x, mouse_y);
-				power = 0;
 			}
 			if (flakes2.at(i).R.y == SCREEN_HEIGHT)
 			{
@@ -384,13 +364,10 @@ int main()
 		}
 		for (int i = 0; i < flakes.size(); i++) //front flakes
 		{
-			if (mode2)
-				flakes.at(i).gravity(mouse_x, mouse_y, power);
 			flakes.at(i).move();
 			if (click)
 			{
 				flakes.at(i).on_click(mouse_x, mouse_y);
-				power = 0;
 			}
 			if (flakes.at(i).R.y == SCREEN_HEIGHT)
 			{

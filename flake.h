@@ -118,39 +118,6 @@ struct flake
 			}
 		}
 	}
-
-	void gravity(int mouse_x, int mouse_y, int power)
-	{
-		double level = 1;
-		if (Middle)
-			level /= 2;
-		if (Back)
-			level /= 3;
-		
-		int dx = mouse_x - R.x;
-		int dy = mouse_y - R.y;
-		if ((abs(dx) * abs(dx)) + (abs(dy) * abs(dy)) <= (power * power * level))
-		{
-			if (dx > 0) //flake left of mouse
-			{
-				R.x += sqrt((dx * dx) / power);
-			}
-			else if (dx < 0) //flake right of mouse
-			{	
-				R.x -= sqrt((dx * dx) / power);
-			}
-			if (dy > 0) //flake above mouse
-			{	
-				R.y += sqrt((dy * dy) / power);
-			}
-			else if (dy < 0) //flake below mouse
-			{	
-				R.y -= sqrt((dy * dy) / power);
-			}
-		}
-
-	}
-
 };
 
 #endif
