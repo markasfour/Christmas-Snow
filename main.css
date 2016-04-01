@@ -1,0 +1,122 @@
+body {
+	background-color: #011A0B;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+#main-container {
+	position: relative;
+	width: 85%;
+	height: 100%;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	background-color: #D1DFCF;
+	box-shadow: 0 0 50px #000000;
+}
+
+#top-header {
+	background-color: #034F20;
+	width: 100%;
+	height: 55px;
+	margin: 0 auto;
+	display: block;
+	border-radius: 0 0 3px 3px;
+	box-shadow: 1px 1px 1px #000000;
+}
+
+#top-header > div {
+	display: inline-block;
+	vertical-align: bottom;
+}
+
+#logo {
+	font-family: 'Great Vibes', cursive;	
+	padding: 5px 10px;
+	float: left;
+	color: #FFFFFF;
+	font-size: 40px;
+	text-shadow: 0 0 5px #FFFFFF;
+}
+
+#top-link-container {
+	float: right;
+	padding: 25px 10px 0 10px;
+}
+
+#top-link-container > a {
+	padding: 2px;
+	text-decoration: none;
+	color: #FFFFFF;
+	font-size: 14px;
+	text-shadow: 0 0 1px #FFBF00;
+	background-color: #3A8249;
+	border-radius: 3px 3px 3px 3px;
+	box-shadow: 1px 1px 1px #000000;
+}
+
+#top-link-container > a:hover {
+	color: #FFFFFF;
+	text-shadow: 0 0 4px #FFFFFF;
+}
+
+#demo-showcase {
+	width: 85%;
+	margin: 0 auto;
+	display: table;
+	padding: 5px;
+}
+
+#instructions-title {
+	text-align: center;
+	margin: 0;
+	padding: 5px;
+	color: #011A0B;
+	font-size: 30px;
+	text-shadow: 0 0 2px #FFFFFF;
+	font-family: 'Great Vibes', cursive;
+}
+
+#instructions {
+	display: table;
+	vertical-align: middle;
+	margin: 0 auto;
+}
+
+#instruction-text {
+	display: table-cell;
+	text-align: center;
+	width: 300px;
+	color: #011A0B;	
+	font-size: 14px;
+	text-shadow: 0 0 1px #FFFFFF;
+}
+
+#demo-container {
+	margin: 0 auto;
+}
+
+#demo {
+	margin: 0 auto;
+}
+
+#footer {
+	padding: 15px;
+	text-align: center;
+	display: block;
+	margin: 0 auto;
+	font-size: 16px;
+	color: #011A0B;
+	text-shadow: 0 0 1px #FFFFFF;
+}
+
+hr {
+	border: 0;
+	width: 90%;
+	height: 1px;
+	background-image: linear-gradient(to right, rgba(255, 0, 0, 0), rgba(255, 0, 0, .75), rgba(255, 0, 0, 0));
+}
