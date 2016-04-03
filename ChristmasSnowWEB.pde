@@ -11,6 +11,9 @@ flakeGroup back;
 ArrayList<PImage> backgrounds;
 PImage background1, background2, background3, background4, frost;
 int bg = 3;
+Audio audio = new Audio();
+String fileExt;
+float volume = 1;
 
 void setup() {
   size(640, 480);
@@ -28,6 +31,16 @@ void setup() {
   backgrounds.add(background2);
   backgrounds.add(background3);
   backgrounds.add(background4);
+
+  if (audio.canPlayType && audio.canPlayType("audio/ogg")) {
+    fileExt = ".ogg";
+  }
+  else {
+	fileExt = ".mp3";
+  }
+  audio.setAttribute("src", "AngelsWeHaveHeardOnHigh" + fileExt);
+  audio.addEventListener("ended", repeat);
+  audio.play();
 }
 
 void draw() {
@@ -36,6 +49,7 @@ void draw() {
   middle.run();
   back.run();
   image(frost, 0, 0);
+  audio.volume = constrain(volume, 0, 1);
 }
 
 void keyPressed() {
@@ -51,6 +65,10 @@ void keyPressed() {
   else if(key == '4') {
    bg = 3; 
   }
+}
+
+void repeat() {
+  audio.play();
 }
 
 class flakeGroup {
