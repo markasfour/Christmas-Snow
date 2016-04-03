@@ -34,11 +34,14 @@ void setup() {
 
   if (audio.canPlayType && audio.canPlayType("audio/ogg")) {
     fileExt = ".ogg";
+	audio.setAttribute("src", "AngelsWeHaveHeardOnHigh" + fileExt);
   }
   else if (audio.canPlayType && audio.canPlayType("audio/mpeg")) {
 	fileExt = ".mp3";
+	audio.setAttribute("src", "AngelsWeHaveHeardOnHigh" + fileExt);
+	audio.setAttribute("type", "audio/mpeg");
   }
-  audio.setAttribute("src", "AngelsWeHaveHeardOnHigh" + fileExt);
+  
   audio.addEventListener("ended", repeat);
   audio.play();
 }
