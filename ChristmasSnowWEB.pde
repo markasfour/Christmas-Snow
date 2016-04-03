@@ -32,11 +32,8 @@ void setup() {
   backgrounds.add(background3);
   backgrounds.add(background4);
 
-  if (audio.canPlayType && audio.canPlayType("audio/ogg")) {
-    fileExt = ".ogg";
-	audio.setAttribute("src", "AngelsWeHaveHeardOnHigh" + fileExt);
-  }
-  else if (audio.canPlayType && audio.canPlayType("audio/mpeg")) {
+  
+  if (audio.canPlayType && audio.canPlayType("audio/mpeg")) {
 	fileExt = ".mp3";
 	audio.setAttribute("src", "AngelsWeHaveHeardOnHigh" + fileExt);
 	audio.setAttribute("type", "audio/mpeg");
