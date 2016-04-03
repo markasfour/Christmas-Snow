@@ -35,7 +35,7 @@ void setup() {
   if (audio.canPlayType && audio.canPlayType("audio/ogg")) {
     fileExt = ".ogg";
   }
-  else {
+  else if (audio.canPlayType && audio.canPlayType("audio/mpeg")) {
 	fileExt = ".mp3";
   }
   audio.setAttribute("src", "AngelsWeHaveHeardOnHigh" + fileExt);
