@@ -65,6 +65,14 @@ void keyPressed() {
   else if(key == '4') {
    bg = 3; 
   }
+  else if(key == 'm' || key == 'M') {
+   if (volume == 1) {
+	volume = 0;
+   }
+   else {
+	volume = 1;
+   }
+  }
 }
 
 void repeat() {
